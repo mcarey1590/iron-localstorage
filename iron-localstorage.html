@@ -11,7 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-Element access to Web Storage API (window.localStorage).
+Element access to Web Storage API (window.localStorage and window.sessionStorage).
 
 Keeps `value` property in sync with localStorage.
 
@@ -95,7 +95,13 @@ is resolved. Local storage will be blown away.
         type: Object,
         notify: true
       },
-
+	  /**
+       * If true: use session storage instead of localstorage
+       */
+	  session: {
+		type: Boolean,
+		value: false
+	  },
       /**
        * If true: do not convert value to JSON on save/load
        */
@@ -138,6 +144,7 @@ is resolved. Local storage will be blown away.
 
     attached: function() {
       window.addEventListener('storage', this._boundHandleStorage);
+	  this.storageRef = this.session ? window.sessionStorage : window.localStorage;
     },
 
     detached: function() {
@@ -178,7 +185,7 @@ is resolved. Local storage will be blown away.
      * @param {boolean=} externalChange true if loading changes from a different window
      */
     _load: function(externalChange) {
-      var v = window.localStorage.getItem(this.name);
+      var v = this.storageRef.getItem(this.name);
 
       if (v === null) {
         this._loaded = true;
@@ -212,9 +219,9 @@ is resolved. Local storage will be blown away.
       var v = this.useRaw ? this.value : JSON.stringify(this.value);
       try {
         if (this.value === null) {
-          window.localStorage.removeItem(this.name);
+          this.storageRef.removeItem(this.name);
         } else {
-          window.localStorage.setItem(this.name, /** @type {string} */ (v));
+          this.storageRef.setItem(this.name, /** @type {string} */ (v));
         }
       }
       catch(ex) {
