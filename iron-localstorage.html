@@ -144,7 +144,6 @@ is resolved. Local storage will be blown away.
 
     attached: function() {
       window.addEventListener('storage', this._boundHandleStorage);
-	  this.storageRef = this.session ? window.sessionStorage : window.localStorage;
     },
 
     detached: function() {
@@ -185,6 +184,7 @@ is resolved. Local storage will be blown away.
      * @param {boolean=} externalChange true if loading changes from a different window
      */
     _load: function(externalChange) {
+	  this.storageRef = this.session ? window.sessionStorage : window.localStorage;
       var v = this.storageRef.getItem(this.name);
 
       if (v === null) {
